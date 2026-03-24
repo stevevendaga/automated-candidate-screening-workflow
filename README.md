@@ -14,6 +14,7 @@ This n8n workflow automates the candidate screening process for AI Engineer posi
 - **Edit Fields**: Extracts candidate information (name, email, body) from emails
 - **Code in JavaScript**: Matches resume against keywords ('mid-level', 'python', 'genai')
 - **IF Match**: Routes candidates based on keyword matching criteria
+- **Gmail: Mark a message as read**
 
 ### Actions
 - **Google Sheets**: Adds candidates to appropriate spreadsheets
@@ -22,6 +23,7 @@ This n8n workflow automates the candidate screening process for AI Engineer posi
 - **Gmail**: Sends automated responses
   - Acceptance email to qualified candidates
   - Rejection email to unqualified candidates
+- **Gmail: Mark a message as read**
 
 ## Workflow Logic
 1. Receives email with resume attachment
