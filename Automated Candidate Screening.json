@@ -327,6 +327,27 @@
           "name": "Gmail OAuth2 API"
         }
       }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        16
+      ],
+      "id": "f750d860-bb00-4462-a928-b3da932d7b89",
+      "name": "Mark a message as read",
+      "webhookId": "f47eb2ca-c6a4-4527-9137-97023436ee57",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GFQdbAAGlbvgFLgk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
     }
   ],
   "pinData": {},
@@ -417,12 +438,24 @@
     },
     "Send a message1": {
       "main": [
-        []
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Send a message": {
       "main": [
-        []
+        [
+          {
+            "node": "Mark a message as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -432,7 +465,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "48b25e44-ba64-4289-acea-a1ce35f359d8",
+  "versionId": "30989cd6-85d3-495d-9bdb-c5f03fc0c1f4",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "de4eace52e177c9304f66ce9a886e867f594a6e7bc8a6d12fb4ff79dd209aa9c"
