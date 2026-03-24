@@ -33,7 +33,7 @@
         },
         "simple": false,
         "filters": {
-          "q": "=subject:\"AI Engineer\" has:attachment"
+          "q": "subject:\"AI Engineer\" has:attachment filename:pdf is:unread"
         },
         "options": {
           "dataPropertyAttachmentsPrefixName": "attachment_",
@@ -414,6 +414,16 @@
           }
         ]
       ]
+    },
+    "Send a message1": {
+      "main": [
+        []
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
     }
   },
   "active": false,
@@ -422,7 +432,7 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "1a9a9821-751d-4358-a6cb-92aed4a979bc",
+  "versionId": "48b25e44-ba64-4289-acea-a1ce35f359d8",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "de4eace52e177c9304f66ce9a886e867f594a6e7bc8a6d12fb4ff79dd209aa9c"
