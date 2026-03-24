@@ -1,0 +1,432 @@
+{
+  "name": "Automated Candidate Screening",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.match}}",
+              "value2": "={{ true }}"
+            }
+          ],
+          "string": []
+        }
+      },
+      "id": "b4412cb7-9b0d-4b13-96f9-c1ea6ad6706f",
+      "name": "IF Match",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        304,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "=subject:\"AI Engineer\" has:attachment"
+        },
+        "options": {
+          "dataPropertyAttachmentsPrefixName": "attachment_",
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -592,
+        32
+      ],
+      "id": "e1b0e7a5-d99c-41f6-af1b-317a2cc0b488",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GFQdbAAGlbvgFLgk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7fa65498-e3ec-4219-8838-883969269571",
+              "name": "Name",
+              "value": "={{ $('Gmail Trigger').item.json.from.value[0].name }}",
+              "type": "string"
+            },
+            {
+              "id": "e9aff016-46f2-4fbc-906c-5eb807ef8258",
+              "name": "Email",
+              "value": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "3f8c3d98-96a9-49d6-ae9a-3aec93190a8b",
+              "name": "Body",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -144,
+        32
+      ],
+      "id": "7e060040-de1d-4a76-8c5a-490a6759fe28",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -368,
+        32
+      ],
+      "id": "9c87033d-6c88-43cb-a7bc-6b9f72d77c7b",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text =$('Extract from File').first().json.text ;\n\nlet keywords = ['mid-level', 'python', 'genai'];\nlet count = 0;\n\nkeywords.forEach(k => {\n  if (text.includes(k)) \n    count++;\n});\n\nreturn [{\n  json: {\n    ...$json,\n    match: count >= 2,\n    keywordCount: count\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        32
+      ],
+      "id": "8af2b646-a010-40e1-9fd3-ced41998b60c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WMRmQcUw5JthlzKZPCYCsBkZrBVRWcQp3wLbJCApFhc",
+          "mode": "list",
+          "cachedResultName": "Candidate Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WMRmQcUw5JthlzKZPCYCsBkZrBVRWcQp3wLbJCApFhc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Candidate Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WMRmQcUw5JthlzKZPCYCsBkZrBVRWcQp3wLbJCApFhc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Edit Fields').item.json.Name }}",
+            "Email": "={{ $('Edit Fields').item.json.Email }}",
+            "Application Date": "={{ $now }}",
+            "Status": "Pending Review"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Application Date",
+              "displayName": "Application Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        -64
+      ],
+      "id": "63154ba7-3522-4cdd-bcf0-785af13a591c",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AbOwTb38AaID0HuC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WMRmQcUw5JthlzKZPCYCsBkZrBVRWcQp3wLbJCApFhc",
+          "mode": "list",
+          "cachedResultName": "Candidate Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WMRmQcUw5JthlzKZPCYCsBkZrBVRWcQp3wLbJCApFhc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 178642950,
+          "mode": "list",
+          "cachedResultName": "Rejected Applications",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WMRmQcUw5JthlzKZPCYCsBkZrBVRWcQp3wLbJCApFhc/edit#gid=178642950"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Application Date": "={{  $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Application Date",
+              "displayName": "Application Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        128
+      ],
+      "id": "9cc63b5d-85d0-4dd1-874e-60f5982cdcf8",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AbOwTb38AaID0HuC",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Application Status: AI Engineer",
+        "emailType": "text",
+        "message": "=Hello {{ $json.Name }}, \n\nThank you for your interest in the AI Engineer Role at our company. Unfortunately we are moving forward with another candidate.\n\nBest regards,\n\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        128
+      ],
+      "id": "306a3792-7a66-4f11-b9b8-52749676b7eb",
+      "name": "Send a message",
+      "webhookId": "30cde295-0038-4fbe-9355-de2eccc310c2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GFQdbAAGlbvgFLgk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Application Status: AI Engineer",
+        "emailType": "text",
+        "message": "=Hello {{ $json.Name }},\n\nYou have been selected for the next phase of the application process.\n\nCongratulations!",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        -64
+      ],
+      "id": "5cad3f78-5b0b-430f-a1b1-1ae78c284101",
+      "name": "Send a message1",
+      "webhookId": "34a97b87-8f46-4caf-962f-c1c04d3f1add",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GFQdbAAGlbvgFLgk",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "IF Match": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "IF Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "1a9a9821-751d-4358-a6cb-92aed4a979bc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "de4eace52e177c9304f66ce9a886e867f594a6e7bc8a6d12fb4ff79dd209aa9c"
+  },
+  "id": "b68jevFeOYVS1Ehr",
+  "tags": []
+}
